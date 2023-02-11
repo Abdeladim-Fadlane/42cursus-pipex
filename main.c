@@ -6,7 +6,7 @@
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 10:36:51 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/11 16:48:14 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/11 17:00:07 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	check_env(char **env)
 	return (0);
 }
 
-void	error(void)
+void	ft_error1(void)
 {
 	write(2, "command not found :\n", 20);
 	exit(1);
@@ -57,7 +57,7 @@ int	main(int ac, char **av, char **env)
 	if (ac < 5 || ac > 5)
 		ft_error();
 	if (check_env(env) == 0)
-		error();
+		ft_error1();
 	p = ft_split(rasepath(env[check_env(env)]), ':');
 	pipe(fd);
 	pid = fork();
