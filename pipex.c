@@ -6,43 +6,56 @@
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 15:36:31 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/10 18:52:46 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/11 16:49:33 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+void	error(char *s)
+{
+	int	i;
+
+	i = 0;
+	write(2, "command not found : ", 21);
+	while (s[i])
+	{
+		write(2, &s[i], 1);
+		i++;
+	}
+	write(2, "\n", 1);
+	exit(0);
+}
+
 char	*get_cmd(char **ptr, char **p)
 {
 	int		l;
 	int		i;
-	int		k;
 	char	*buff;
 
 	i = 0;
 	l = 0;
 	buff = "";
+	if (access(ptr[0], F_OK) == 0)
+		return (ptr[0]);
 	while (p[l])
 		l++;
 	while (i < l)
 	{
 		buff = ft_strjoin(p[i], "/");
 		buff = ft_strjoin(buff, ptr[0]);
-		k = access(buff, F_OK);
-		if (k == 0)
-			break ;
+		if (access(buff, F_OK) == 0)
+			return (buff);
 		i++;
 	}
-	if (k == -1)
-		exit(0);
-	return (buff);
+	return (NULL);
 }
 
 void	first_proccess(char **av, char **ptr, char **p, int *fd)
 {
 	int	fd1;
 
-	fd1 = open(av[1], O_RDONLY);
+	fd1 = open(av[1], O_RDONLY, 0644);
 	if (fd1 == -1)
 	{
 		perror(av[1]);
@@ -51,6 +64,8 @@ void	first_proccess(char **av, char **ptr, char **p, int *fd)
 	dup2(fd1, 0);
 	close(fd[0]);
 	dup2(fd[1], 1);
+	if (get_cmd(ptr, p) == NULL)
+		error(av[2]);
 	execve(get_cmd(ptr, p), ptr, NULL);
 }
 
@@ -60,9 +75,14 @@ void	second_proccess(char **av, char **ptr2, char **p, int *fd)
 
 	fd2 = open(av[4], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fd2 == -1)
+	{
 		perror(av[4]);
+		exit(1);
+	}
 	dup2(fd2, 1);
 	close(fd[1]);
 	dup2(fd[0], 0);
+	if (get_cmd(ptr2, p) == NULL)
+		error(av[3]);
 	execve(get_cmd(ptr2, p), ptr2, NULL);
 }

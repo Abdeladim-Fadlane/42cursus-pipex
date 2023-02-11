@@ -6,7 +6,7 @@
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 11:57:26 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/10 18:54:41 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/11 09:48:43 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	i = 0;
 	j = 0;
 	if (!s1)
-		s1 = ft_strdup("");
+		s1 = "";
 	if (!s2)
 		return (s1);
 	p = malloc((ft_strlen(s1) + ft_strlen(s2) + 1));
