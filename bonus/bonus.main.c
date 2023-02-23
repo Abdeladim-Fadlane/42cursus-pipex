@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   bonus.main.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 10:36:51 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/18 09:50:52 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/23 16:34:15 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	ft_error(void)
 {
-	write(2, "Error check if you  enter 5 arg !\n", 34);
-	exit(1);
+	write(2, "Error you put less than forth args !\n", 36);
+	exit(0);
 }
 
 char	*rasepath(char *p)
@@ -49,24 +49,38 @@ int	main(int ac, char **av, char **env)
 {
 	int			i;
 	t_object	*lst;
+	int			track_fd;
 
 	lst = malloc(sizeof(t_object));
 	lst->envp = env;
 	i = 0;
-	if (ac != 5)
-		ft_error();
 	if (check_env(lst->envp) == 0)
 		ft_error1();
 	lst->p = ft_split(rasepath(lst->envp[check_env(lst->envp)]), ':');
-	pipe(lst->fd);
-	lst->pid = fork();
-	if (lst->pid == 0)
+	if (ac > 4)
+	{
+		if (pipe(lst->fd) < 0)
+			ft_error();
 		first_proccess(av, ft_split(av[2], 32), lst);
-	lst->pid2 = fork();
-	if (lst->pid2 == 0)
-		second_proccess(av, ft_split(av[3], 32), lst);
-	close(lst->fd[1]);
-	close(lst->fd[0]);
-	waitpid(lst->pid, NULL, 0);
-	waitpid(lst->pid2, NULL, 0);
+		close(lst->fd[1]);
+		track_fd = lst->fd[0];
+		i += 3;
+		while (ac - 2 > i)
+		{
+			if (pipe(lst->fd) < 0)
+				ft_error();
+			if (i < ac - 2)
+				midlle_proccess(av, ft_split(av[i], 32), lst, i, track_fd);
+			close(lst->fd[1]);
+			close(track_fd);
+			track_fd = lst->fd[0];
+			i++;
+		}
+		second_proccess(av, ft_split(av[ac - 2], 32), lst, track_fd, ac - 1);
+		close(track_fd);
+	}
+	else
+		ft_error();
+	while (wait(NULL) != -1)
+		;
 }

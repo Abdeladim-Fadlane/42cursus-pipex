@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   bonus.pipex.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 15:36:31 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/18 10:02:31 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/23 16:34:11 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,44 +46,64 @@ char	*get_cmd(char **ptr, char **p)
 		buff = ft_strjoin(buff, ptr[0]);
 		if (access(buff, F_OK) == 0)
 			return (buff);
-		free(buff);
 		i++;
 	}
-	return (free(buff), NULL);
+	return (NULL);
 }
 
 void	first_proccess(char **av, char **ptr, t_object *lst)
 {
 	int	fd1;
 
-	fd1 = open(av[1], O_RDONLY, 0644);
-	if (fd1 == -1)
+	lst->pid = fork();
+	if (lst->pid == 0)
 	{
-		perror(av[1]);
-		exit(1);
+		fd1 = open(av[1], O_RDONLY, 0644);
+		if (fd1 == -1)
+		{
+			perror(av[1]);
+			exit(1);
+		}
+		dup2(fd1, 0);
+		close(lst->fd[0]);
+		dup2(lst->fd[1], 1);
+		if (get_cmd(ptr, lst->p) == NULL)
+			error(av[2]);
+		execve(get_cmd(ptr, lst->p), ptr, lst->envp);
 	}
-	dup2(fd1, 0);
-	close(lst->fd[0]);
-	dup2(lst->fd[1], 1);
-	if (get_cmd(ptr, lst->p) == NULL)
-		error(av[2]);
-	execve(get_cmd(ptr, lst->p), ptr, lst->envp);
 }
 
-void	second_proccess(char **av, char **ptr2, t_object *lst)
+void	second_proccess(char **av, char **ptr2, t_object *lst, int track, int k)
 {
 	int	fd2;
 
-	fd2 = open(av[4], O_CREAT | O_RDWR | O_TRUNC, 0644);
-	if (fd2 == -1)
+	lst->pid2 = fork();
+	if (lst->pid2 == 0)
 	{
-		perror(av[4]);
-		exit(1);
+		fd2 = open(av[k], O_CREAT | O_RDWR | O_TRUNC, 0644);
+		if (fd2 == -1)
+		{
+			perror(av[k]);
+			exit(1);
+		}
+		dup2(fd2, 1);
+		dup2(track, 0);
+		if (get_cmd(ptr2, lst->p) == NULL)
+			error(av[k - 1]);
+		execve(get_cmd(ptr2, lst->p), ptr2, lst->envp);
 	}
-	dup2(fd2, 1);
-	close(lst->fd[1]);
-	dup2(lst->fd[0], 0);
-	if (get_cmd(ptr2, lst->p) == NULL)
-		error(av[3]);
-	execve(get_cmd(ptr2, lst->p), ptr2, lst->envp);
+}
+
+void	midlle_proccess(char **av, char **ptr2, t_object *lst, int k, int track)
+{
+	lst->pid3 = fork();
+	if (lst->pid3 == 0)
+	{
+		dup2(track, 0);
+		close(lst->fd[0]);
+		if (get_cmd(ptr2, lst->p) == NULL)
+			error(av[k]);
+		dup2(lst->fd[1], 1);
+		execve(get_cmd(ptr2, lst->p), ptr2, lst->envp);
+	}
 }
