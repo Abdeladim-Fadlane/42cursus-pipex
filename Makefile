@@ -6,7 +6,7 @@
 #    By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/07 15:58:02 by afadlane          #+#    #+#              #
-#    Updated: 2023/02/14 16:38:22 by afadlane         ###   ########.fr        #
+#    Updated: 2023/02/24 10:21:41 by afadlane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ NAME = pipex
 CFLAGS = -Wall -Werror -Wextra 
 
 SRC = pipex.c ft_split.c libft_utils.c main.c
-SRC2 = bonus/bonus.pipex.c bonus/bonus.ft_split.c bonus/bonus.libft_utils.c bonus/bonus.main.c
+SRC2 = bonus/bonus.pipex.c bonus/bonus.ft_split.c bonus/bonus.libft_utils.c bonus/bonus.main.c bonus/bonus_utils.c
 
 cc = gcc
 OBJ = ${SRC:.c=.o}

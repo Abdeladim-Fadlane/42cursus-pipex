@@ -6,7 +6,7 @@
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 15:36:31 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/18 10:02:31 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/24 11:20:10 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,9 @@ char	*get_cmd(char **ptr, char **p)
 		buff = ft_strjoin(buff, ptr[0]);
 		if (access(buff, F_OK) == 0)
 			return (buff);
-		free(buff);
 		i++;
 	}
-	return (free(buff), NULL);
+	return (NULL);
 }
 
 void	first_proccess(char **av, char **ptr, t_object *lst)

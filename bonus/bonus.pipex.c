@@ -6,7 +6,7 @@
 /*   By: afadlane <afadlane@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 15:36:31 by afadlane          #+#    #+#             */
-/*   Updated: 2023/02/23 16:34:11 by afadlane         ###   ########.fr       */
+/*   Updated: 2023/02/24 11:10:53 by afadlane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,12 @@ void	first_proccess(char **av, char **ptr, t_object *lst)
 		dup2(lst->fd[1], 1);
 		if (get_cmd(ptr, lst->p) == NULL)
 			error(av[2]);
-		execve(get_cmd(ptr, lst->p), ptr, lst->envp);
+		if (execve(get_cmd(ptr, lst->p), ptr, lst->envp) == -1)
+			perror("execve : ");
 	}
 }
 
-void	second_proccess(char **av, char **ptr2, t_object *lst, int track, int k)
+void	second_proccess(char **av, char **ptr2, t_object *lst, int k)
 {
 	int	fd2;
 
@@ -87,23 +88,25 @@ void	second_proccess(char **av, char **ptr2, t_object *lst, int track, int k)
 			exit(1);
 		}
 		dup2(fd2, 1);
-		dup2(track, 0);
+		dup2(lst->flag_fd, 0);
 		if (get_cmd(ptr2, lst->p) == NULL)
 			error(av[k - 1]);
-		execve(get_cmd(ptr2, lst->p), ptr2, lst->envp);
+		if (execve(get_cmd(ptr2, lst->p), ptr2, lst->envp) == -1)
+			perror("execve : ");
 	}
 }
 
-void	midlle_proccess(char **av, char **ptr2, t_object *lst, int k, int track)
+void	midlle_proccess(char **av, char **ptr2, t_object *lst, int k)
 {
 	lst->pid3 = fork();
 	if (lst->pid3 == 0)
 	{
-		dup2(track, 0);
+		dup2(lst->flag_fd, 0);
 		close(lst->fd[0]);
 		if (get_cmd(ptr2, lst->p) == NULL)
 			error(av[k]);
 		dup2(lst->fd[1], 1);
-		execve(get_cmd(ptr2, lst->p), ptr2, lst->envp);
+		if (execve(get_cmd(ptr2, lst->p), ptr2, lst->envp) == -1)
+			perror("execve : ");
 	}
 }
